@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoxFlow AI Studio — Dịch Thuật & Lồng Tiếng Video Đa Ngôn Ngữ</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #121827;
+      --panel-2: #192136;
+      --border: #26314d;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(18, 24, 39, 0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, select, input, textarea {
+      font-family: inherit;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: #212b46;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 390px;
+      gap: 16px;
+      padding: 16px 24px;
+      flex: 1;
+    }
+
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px 14px;
+      text-align: center;
+      background: rgba(25, 33, 54, 0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(6, 182, 212, 0.08);
+    }
+
+    .dropzone strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .dropzone span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    select, input[type="text"], textarea {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--panel-2);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #050811;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    video, canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    #hiddenVideo {
+      display: none;
+    }
+
+    .status-pill {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(11, 15, 25, 0.8);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .controls-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--panel-2);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .controls-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .audio-switch {
+      display: inline-flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .audio-switch button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .audio-switch button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .progress-box {
+      background: var(--panel-2);
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.25s ease;
+    }
+
+    .steps-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .step-item {
+      padding: 6px;
+      border-radius: 6px;
+      background: var(--bg);
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .step-item.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .step-item.done {
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .sub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .sub-item {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.15s;
+    }
+
+    .sub-item.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.25);
+    }
+
+    .sub-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .time-badge {
+      background: var(--bg);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+
+    .sub-item textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 46px;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 560px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1e293b;
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">VF</div>
+    <div>
+      VoxFlow AI Studio
+      <span class="badge">Offline-Ready • Web Speech &amp; Canvas</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" id="btnOpenImport">📝 Nhập Kịch Bản / .SRT</button>
+    <button class="btn" id="btnExportSRT">⬇ Tải .SRT</button>
+    <button class="btn" id="btnExportVTT">⬇ Tải .VTT</button>
+    <button class="btn btn-success" id="btnExportVideo">🎬 Xuất Video (.WEBM)</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- CỘT TRÁI: TẢI VIDEO & CẤU HÌNH -->
+  <div class="card">
+    <div class="card-title">1. Nguồn Video &amp; Cấu Hình AI</div>
+
+    <div class="dropzone" id="dropzone">
+      <strong>📁 Kéo thả hoặc chọn file Video</strong>
+      <span id="fileInfo">Hỗ trợ MP4, WebM, MOV (Đang dùng Video Demo)</span>
+      <input type="file" id="fileInput" accept="video/*" hidden />
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Ngôn ngữ gốc</label>
+        <select id="srcLang">
+          <option value="en-US">Tiếng Anh (English)</option>
+          <option value="vi-VN">Tiếng Việt</option>
+          <option value="ja-JP">Tiếng Nhật (日本語)</option>
+          <option value="ko-KR">Tiếng Hàn (한국어)</option>
+          <option value="zh-CN">Tiếng Trung (中文)</option>
+          <option value="fr-FR">Tiếng Pháp (Français)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ngôn ngữ đích (Dịch sang)</label>
+        <select id="tgtLang">
+          <option value="vi-VN" selected>Tiếng Việt</option>
+          <option value="en-US">Tiếng Anh (English)</option>
+          <option value="ja-JP">Tiếng Nhật (日本語)</option>
+          <option value="ko-KR">Tiếng Hàn (한국어)</option>
+          <option value="zh-CN">Tiếng Trung (中文)</option>
+          <option value="fr-FR">Tiếng Pháp (Français)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Giọng đọc Neural TTS trên trình duyệt</label>
+      <select id="voiceSelect">
+        <option value="">Tự động chọn giọng phù hợp nhất</option>
+      </select>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Chế độ phụ đề</label>
+        <select id="subMode">
+          <option value="bilingual" selected>Song ngữ (Đích + Gốc)</option>
+          <option value="target">Chỉ ngôn ngữ đích</option>
+          <option value="source">Chỉ ngôn ngữ gốc</option>
+          <option value="none">Ẩn phụ đề</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tốc độ đọc TTS</label>
+        <select id="ttsRate">
+          <option value="0.85">0.85x (Chậm)</option>
+          <option value="1.0" selected>1.0x (Chuẩn)</option>
+          <option value="1.15">1.15x (Nhanh)</option>
+          <option value="1.3">1.3x (Rất nhanh)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <span>Tự động đọc lồng tiếng AI khi phát</span>
+      <input type="checkbox" id="autoDubToggle" checked />
+    </div>
+
+    <div class="toggle-row">
+      <span>Hiệu ứng Lip-Sync &amp; Sóng âm</span>
+      <input type="checkbox" id="lipSyncToggle" checked />
+    </div>
+
+    <button class="btn btn-primary" id="btnProcess" style="justify-content:center; padding:11px;">
+      ✨ Bắt Đầu Dịch Thuật &amp; Đồng Bộ AI
+    </button>
+
+    <button class="btn" id="btnSpeechRec" style="justify-content:center;">
+      🎙️ Tự động nghe &amp; chép lời từ Video (Mic)
+    </button>
+  </div>
+
+  <!-- CỘT GIỮA: TRÌNH PHÁT CANVAS + VIDEO -->
+  <div class="card">
+    <div class="card-title">
+      <span>2. Trình Phát &amp; Lồng Tiếng Thời Gian Thực</span>
+      <span id="modeLabel" style="color:var(--accent); font-size:12px;">Chế độ: Lồng tiếng AI</span>
+    </div>
+
+    <div class="stage-wrapper">
+      <video id="hiddenVideo" playsinline crossorigin="anonymous"></video>
+      <canvas id="stageCanvas" width="1280" height="720"></canvas>
+      <div class="status-pill">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Sẵn sàng phát</span>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <div class="timeline-row">
+        <span id="timeCurrent">00:00</span>
+        <input type="range" id="seekBar" min="0" max="32" step="0.1" value="0" />
+        <span id="timeTotal">00:32</span>
+      </div>
+
+      <div class="controls-buttons">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn btn-primary" id="btnPlayPause">▶ Phát</button>
+          <button class="btn" id="btnRestart">↺</button>
+        </div>
+
+        <div class="audio-switch">
+          <button id="btnAudioDub" class="active">🔊 Lồng tiếng AI</button>
+          <button id="btnAudioOrig">🎬 Âm thanh gốc</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; font-size:12px;">
+          <span>Tốc độ:</span>
+          <select id="playbackSpeed" style="padding:5px 8px;">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-box">
+      <div style="display:flex; justify-content:space-between; font-size:12px;">
+        <span id="pipelineStatus">Trạng thái xử lý AI: Đã sẵn sàng</span>
+        <span id="pipelinePercent">100%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:100%;"></div>
+      </div>
+      <div class="steps-list">
+        <div class="step-item done" id="step1">1. Tách âm thanh</div>
+        <div class="step-item done" id="step2">2. Chép lời STT</div>
+        <div class="step-item done" id="step3">3. Dịch ngữ cảnh</div>
+        <div class="step-item done" id="step4">4. Khớp giọng TTS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CỘT PHẢI: TRÌNH CHỈNH SỬA PHỤ ĐỀ -->
+  <div class="card">
+    <div class="card-title">
+      <span>3. Kịch Bản &amp; Phụ Đề Chi Tiết</span>
+      <button class="btn" id="btnAddSub" style="padding:4px 9px; font-size:12px;">+ Thêm câu</button>
+    </div>
+    <div class="sub-list" id="subList"></div>
+  </div>
+</div>
+
+<!-- MODAL NHẬP KỊCH BẢN / SRT -->
+<div class="modal-backdrop" id="importModal">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>Nhập Kịch Bản Hoặc Dán Nội Dung .SRT</h3>
+      <button class="btn" id="btnCloseImport">✕</button>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted);">
+      Bạn có thể dán nội dung file <strong>.SRT</strong> chuẩn hoặc nhập mỗi dòng một câu thoại. Hệ thống sẽ tự động chia đều mốc thời gian theo độ dài video của bạn và dịch sang ngôn ngữ đích.
+    </p>
+    <textarea id="importText" rows="9" placeholder="Ví dụ:
+Xin chào mọi người, chào mừng đến với kênh của mình.
+Hôm nay chúng ta sẽ khám phá công nghệ dịch video bằng trí tuệ nhân tạo.
+Chỉ với vài cú nhấp chuột, video của bạn có thể nói được nhiều thứ tiếng."></textarea>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn" id="btnCancelImport">Hủy</button>
+      <button class="btn btn-primary" id="btnApplyImport">Áp dụng &amp; Dịch tự động</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Dữ liệu mẫu ban đầu
+  const DEFAULT_SEGMENTS = [
+    {
+      start: 0,
+      end: 7.5,
+      source: "Welcome to VoxFlow AI Studio, the next generation video localization platform.",
+      translations: {
+        "vi-VN": "Chào mừng đến với VoxFlow AI Studio, nền tảng bản địa hóa video thế hệ mới.",
+        "en-US": "Welcome to VoxFlow AI Studio, the next generation video localization platform.",
+        "ja-JP": "次世代の動画ローカライズプラットフォーム、VoxFlow AI Studioへようこそ。",
+        "ko-KR": "차세대 비디오 현지화 플랫폼인 VoxFlow AI Studio에 오신 것을 환영합니다.",
+        "zh-CN": "欢迎来到 VoxFlow AI Studio，新一代视频本地化平台。",
+        "fr-FR": "Bienvenue sur VoxFlow AI Studio, la plateforme de localisation vidéo nouvelle génération."
+      }
+    },
+    {
+      start: 7.5,
+      end: 15.5,
+      source: "Upload any video and translate speech into natural sounding voices in seconds.",
+      translations: {
+        "vi-VN": "Tải lên bất kỳ video nào và chuyển đổi lời thoại thành giọng đọc tự nhiên chỉ trong vài giây.",
+        "en-US": "Upload any video and translate speech into natural sounding voices in seconds.",
+        "ja-JP": "あらゆる動画をアップロードし、数秒で自然な音声に翻訳します。",
+        "ko-KR": "어떤 동영상이든 업로드하여 몇 초 만에 자연스러운 목소리로 번역하세요.",
+        "zh-CN": "上传任何视频，几秒钟内即可将语音翻译成自然流畅的声音。",
+        "fr-FR": "Téléchargez n'importe quelle vidéo et traduisez la parole en voix naturelles en quelques secondes."
+      }
+    },
+    {
+      start: 15.5,
+      end: 24.0,
+      source: "Edit every subtitle line, preview neural voices, and export ready-to-share videos.",
+      translations: {
+        "vi-VN": "Chỉnh sửa từng dòng phụ đề, nghe thử giọng đọc AI và xuất video sẵn sàng chia sẻ.",
+        "en-US": "Edit every subtitle line, preview neural voices, and export ready-to-share videos.",
+        "ja-JP": "字幕を1行ずつ編集し、AI音声をプレビューして共有可能な動画を書き出せます。",
+        "ko-KR": "모든 자막 줄을 편집하고 AI 음성을 미리 들은 후 공유 가능한 비디오로 내보내세요.",
+        "zh-CN": "编辑每一行字幕，预览神经语音，并导出可直接分享的视频。",
+        "fr-FR": "Modifiez chaque ligne de sous-titre, prévisualisez les voix IA et exportez vos vidéos."
+      }
+    },
+    {
+      start: 24.0,
+      end: 32.0,
+      source: "Break language barriers and reach global audiences effortlessly today.",
+      translations: {
+        "vi-VN": "Phá vỡ rào cản ngôn ngữ và tiếp cận khán giả toàn cầu thật dễ dàng ngay hôm nay.",
+        "en-US": "Break language barriers and reach global audiences effortlessly today.",
+        "ja-JP": "言語の壁を打ち破り、世界中の視聴者に今すぐ簡単に届けましょう。",
+        "ko-KR": "오늘 언어의 장벽을 허물고 전 세계 시청자에게 손쉽게 다가가세요.",
+        "zh-CN": "打破语言障碍，今天就轻松触达全球受众。",
+        "fr-FR": "Brisez les barrières linguistiques et touchez un public mondial dès aujourd'hui."
+      }
+    }
+  ];
+
+  // Từ điển dịch nhanh offline cơ bản cho các câu tự nhập
+  const QUICK_DICT = {
+    "xin chào": { "en-US": "Hello everyone", "ja-JP": "こんにちは", "ko-KR": "안녕하세요", "zh-CN": "大家好", "fr-FR": "Bonjour à tous" },
+    "cảm ơn": { "en-US": "Thank you very much", "ja-JP": "ありがとうございます", "ko-KR": "감사합니다", "zh-CN": "非常感谢", "fr-FR": "Merci beaucoup" },
+    "hôm nay": { "en-US": "Today we will explore this topic", "ja-JP": "今日はこのテーマを探ります", "ko-KR": "오늘 이 주제를 살펴보겠습니다", "zh-CN": "今天我们将探讨这个主题", "fr-FR": "Aujourd'hui nous explorons ce sujet" }
+  };
+
+  let segments = JSON.parse(JSON.stringify(DEFAULT_SEGMENTS));
+  let hasCustomVideo = false;
+  let duration = 32;
+  let currentTime = 0;
+  let isPlaying = false;
+  let audioMode = "dub"; // 'dub' | 'orig'
+  let lastSpokenIndex = -1;
+  let isSpeakingTTS = false;
+  let animFrameId = null;
+  let lastTimestamp = 0;
+  let voices = [];
+
+  const videoEl = document.getElementById("hiddenVideo");
+  const canvas = document.getElementById("stageCanvas");
+  const ctx = canvas.getContext("2d");
+  const seekBar = document.getElementById("seekBar");
+  const timeCurrentEl = document.getElementById("timeCurrent");
+  const timeTotalEl = document.getElementById("timeTotal");
+  const subListEl = document.getElementById("subList");
+  const tgtLangEl = document.getElementById("tgtLang");
+  const srcLangEl = document.getElementById("srcLang");
+  const subModeEl = document.getElementById("subMode");
+  const voiceSelectEl = document.getElementById("voiceSelect");
+  const ttsRateEl = document.getElementById("ttsRate");
+  const autoDubToggle = document.getElementById("autoDubToggle");
+  const lipSyncToggle = document.getElementById("lipSyncToggle");
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
+  function formatTime(sec) {
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  function formatSRTTime(sec) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.floor(sec % 60);
+    const ms = Math.floor((sec % 1) * 1000);
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")},${String(ms).padStart(3, "0")}`;
+  }
+
+  function loadVoices() {
+    if (!("speechSynthesis" in window)) return;
+    voices = window.speechSynthesis.getVoices();
+    const tgt = tgtLangEl.value.split("-")[0];
+    voiceSelectEl.innerHTML = '<option value="">Tự động chọn giọng phù hợp nhất</option>';
+    voices.forEach((v, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = `${v.name} (${v.lang})`;
+      if (v.lang.toLowerCase().startsWith(tgt.toLowerCase())) {
+        opt.textContent = "⭐ " + opt.textContent;
+      }
+      voiceSelectEl.appendChild(opt);
+    });
+  }
+
+  if ("speechSynthesis" in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function getTargetText(seg) {
+    const lang = tgtLangEl.value;
+    if (seg.translations && seg.translations[lang]) {
+      return seg.translations[lang];
+    }
+    return seg.source;
+  }
+
+  function speakText(text, langCode) {
+    if (!("speechSynthesis" in window) || !text.trim()) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = langCode || tgtLangEl.value;
+    utter.rate = parseFloat(ttsRateEl.value) || 1.0;
+
+    if (voiceSelectEl.value !== "" && voices[voiceSelectEl.value]) {
+      utter.voice = voices[voiceSelectEl.value];
+    } else {
+      const prefix = utter.lang.split("-")[0].toLowerCase();
+      const matched = voices.find(v => v.lang.toLowerCase().startsWith(prefix));
+      if (matched) utter.voice = matched;
+    }
+
+    utter.onstart = () => { isSpeakingTTS = true; };
+    utter.onend = () => { isSpeakingTTS = false; };
+    utter.onerror = () => { isSpeakingTTS = false; };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function renderSubtitlesList() {
+    const tgt = tgtLangEl.value;
+    subListEl.innerHTML = "";
+    segments.forEach((seg, idx) => {
+      const item = document.createElement("div");
+      item.className = "sub-item";
+      item.id = `sub-item-${idx}`;
+
+      const translated = getTargetText(seg);
+      item.innerHTML = `
+        <div class="sub-head">
+          <span class="time-badge" title="Nhấn để tua tới đoạn này">${formatTime(seg.start)} → ${formatTime(seg.end)}</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-tts" style="padding:3px 8px; font-size:11px;">🔊 Nghe thử</button>
+            <button class="btn btn-danger btn-del" style="padding:3px 7px; font-size:11px;">✕</button>
+          </div>
+        </div>
+        <input type="text" class="src-input" value="${seg.source.replace(/"/g, '&quot;')}" placeholder="Lời thoại gốc..." />
+        <textarea class="tgt-input" placeholder="Bản dịch lồng tiếng...">${translated}</textarea>
+      `;
+
+      item.querySelector(".time-badge").onclick = () => {
+        seekTo(seg.start + 0.05);
+      };
+
+      item.querySelector(".btn-tts").onclick = () => {
+        speakText(item.querySelector(".tgt-input").value, tgt);
+      };
+
+      item.querySelector(".btn-del").onclick = () => {
+        if (segments.length <= 1) return;
+        segments.splice(idx, 1);
+        renderSubtitlesList();
+      };
+
+      item.querySelector(".src-input").oninput = (e) => {
+        seg.source = e.target.value;
+      };
+
+      item.querySelector(".tgt-input").oninput = (e) => {
+        if (!seg.translations) seg.translations = {};
+        seg.translations[tgt] = e.target.value;
+      };
+
+      subListEl.appendChild(item);
+    });
+  }
+
+  function getActiveSegmentIndex(t) {
+    return segments.findIndex(s => t >= s.start && t < s.end);
+  }
+
+  function drawStage() {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (hasCustomVideo && videoEl.readyState >= 2) {
+      // Vẽ khung hình từ video người dùng tải lên
+      const vw = videoEl.videoWidth || W;
+      const vh = videoEl.videoHeight || H;
+      const scale = Math.min(W / vw, H / vh);
+      const dw = vw * scale;
+      const dh = vh * scale;
+      const dx = (W - dw) / 2;
+      const dy = (H - dh) / 2;
+      ctx.fillStyle = "#050811";
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(videoEl, dx, dy, dw, dh);
+    } else {
+      // Vẽ sân khấu Demo AI khi chưa tải video
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, "#0f172a");
+      grad.addColorStop(1, "#1e1b4b");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Lưới nền
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.12)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 60) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += 60) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      // Nhân vật AI Avatar ở trung tâm
+      const cx = W / 2;
+      const cy = H / 2 - 40;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 110, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(99, 102, 241, 0.18)";
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#38bdf8";
+      ctx.stroke();
+
+      // Đầu nhân vật
+      ctx.beginPath();
+      ctx.arc(cx, cy - 10, 56, 0, Math.PI * 2);
+      ctx.fillStyle = "#f8fafc";
+      ctx.fill();
+
+      // Mắt
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath(); ctx.arc(cx - 20, cy - 20, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + 20, cy - 20, 6, 0, Math.PI * 2); ctx.fill();
+
+      // Khẩu hình Lip-Sync chuyển động khi phát
+      const talking = isPlaying && (isSpeakingTTS || lipSyncToggle.checked);
+      const mouthOpen = talking ? Math.abs(Math.sin(currentTime * 14)) * 14 + 3 : 3;
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 12, 16, mouthOpen, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 18px Segoe UI, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("CHẾ ĐỘ DEMO • Tải video của bạn ở cột bên trái để dịch trực tiếp", cx, cy + 145);
+    }
+
+    // Sóng âm thanh Equalizer góc trên phải
+    if (lipSyncToggle.checked) {
+      const bars = 14;
+      const startX = W - 210;
+      const baseY = 58;
+      for (let i = 0; i < bars; i++) {
+        const amp = isPlaying ? (Math.sin(currentTime * 12 + i * 0.9) * 0.5 + 0.5) * 26 + 4 : 4;
+        ctx.fillStyle = audioMode === "dub" ? "#06b6d4" : "#f59e0b";
+        ctx.fillRect(startX + i * 12, baseY - amp / 2, 7, amp);
+      }
+    }
+
+    // Vẽ phụ đề lên khung hình
+    const activeIdx = getActiveSegmentIndex(currentTime);
+    const mode = subModeEl.value;
+    if (activeIdx !== -1 && mode !== "none") {
+      const seg = segments[activeIdx];
+      const tgtText = getTargetText(seg);
+      const srcText = seg.source;
+
+      const boxW = W * 0.84;
+      const boxX = (W - boxW) / 2;
+      const boxH = mode === "bilingual" ? 112 : 72;
+      const boxY = H - boxH - 28;
+
+      ctx.fillStyle = "rgba(8, 12, 24, 0.82)";
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 14);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.45)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.textAlign = "center";
+      if (mode === "bilingual") {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "700 26px Segoe UI, sans-serif";
+        ctx.fillText(tgtText, W / 2, boxY + 44, boxW - 40);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "500 19px Segoe UI, sans-serif";
+        ctx.fillText(srcText, W / 2, boxY + 84, boxW - 40);
+      } else if (mode === "target") {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "700 27px Segoe UI, sans-serif";
+        ctx.fillText(tgtText, W / 2, boxY + 46, boxW - 40);
+      } else if (mode === "source") {
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "600 25px Segoe UI, sans-serif";
+        ctx.fillText(srcText, W / 2, boxY + 46, boxW - 40);
+      }
+    }
+  }
+
+  function highlightActiveSubtitle(idx) {
+    document.querySelectorAll(".sub-item").forEach((el, i) => {
+      el.classList.toggle("active", i === idx);
+    });
+  }
+
+  function syncAudioAndSubtitles() {
+    const idx = getActiveSegmentIndex(currentTime);
+    highlightActiveSubtitle(idx);
+
+    if (isPlaying && idx !== -1 && idx !== lastSpokenIndex) {
+      lastSpokenIndex = idx;
+      if (audioMode === "dub" && autoDubToggle.checked) {
+        speakText(getTargetText(segments[idx]), tgtLangEl.value);
+      }
+    }
+  }
+
+  function loop(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const dt = (timestamp - lastTimestamp) / 1000;
+    lastTimestamp = timestamp;
+
+    if (isPlaying) {
+      if (hasCustomVideo) {
+        currentTime = videoEl.currentTime;
+        if (videoEl.ended) {
+          pausePlayback();
+        }
+      } else {
+        const speed = parseFloat(document.getElementById("playbackSpeed").value) || 1;
+        currentTime += dt * speed;
+        if (currentTime >= duration) {
+          currentTime = duration;
+          pausePlayback();
+        }
+      }
+
+      seekBar.value = currentTime;
+      timeCurrentEl.textContent = formatTime(currentTime);
+      syncAudioAndSubtitles();
+    }
+
+    drawStage();
+    animFrameId = requestAnimationFrame(loop);
+  }
+
+  function startPlayback() {
+    isPlaying = true;
+    lastTimestamp = 0;
+    document.getElementById("btnPlayPause").textContent = "⏸ Tạm dừng";
+    document.getElementById("statusText").textContent = "Đang phát";
+    if (hasCustomVideo) {
+      videoEl.muted = (audioMode === "dub");
+      videoEl.playbackRate = parseFloat(document.getElementById("playbackSpeed").value) || 1;
+      videoEl.play();
+    }
+    syncAudioAndSubtitles();
+  }
+
+  function pausePlayback() {
+    isPlaying = false;
+    document.getElementById("btnPlayPause").textContent = "▶ Phát";
+    document.getElementById("statusText").textContent = "Đã tạm dừng";
+    if (hasCustomVideo) videoEl.pause();
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    isSpeakingTTS = false;
+  }
+
+  function seekTo(sec) {
+    currentTime = Math.max(0, Math.min(duration, sec));
+    seekBar.value = currentTime;
+    timeCurrentEl.textContent = formatTime(currentTime);
+    lastSpokenIndex = -1;
+    if (hasCustomVideo) {
+      videoEl.currentTime = currentTime;
+    }
+    syncAudioAndSubtitles();
+    drawStage();
+  }
+
+  // Sự kiện điều khiển phát
+  document.getElementById("btnPlayPause").onclick = () => {
+    if (isPlaying) pausePlayback();
+    else {
+      if (currentTime >= duration) seekTo(0);
+      startPlayback();
+    }
+  };
+
+  document.getElementById("btnRestart").onclick = () => {
+    seekTo(0);
+    startPlayback();
+  };
+
+  seekBar.oninput = (e) => {
+    seekTo(parseFloat(e.target.value));
+  };
+
+  document.getElementById("playbackSpeed").onchange = (e) => {
+    if (hasCustomVideo) videoEl.playbackRate = parseFloat(e.target.value);
+  };
+
+  // Chuyển chế độ âm thanh
+  document.getElementById("btnAudioDub").onclick = () => {
+    audioMode = "dub";
+    document.getElementById("btnAudioDub").classList.add("active");
+    document.getElementById("btnAudioOrig").classList.remove("active");
+    document.getElementById("modeLabel").textContent = "Chế độ: Lồng tiếng AI";
+    if (hasCustomVideo) videoEl.muted = true;
+    lastSpokenIndex = -1;
+    showToast("Đã bật chế độ Lồng tiếng AI (tắt tiếng gốc)");
+  };
+
+  document.getElementById("btnAudioOrig").onclick = () => {
+    audioMode = "orig";
+    document.getElementById("btnAudioOrig").classList.add("active");
+    document.getElementById("btnAudioDub").classList.remove("active");
+    document.getElementById("modeLabel").textContent = "Chế độ: Âm thanh gốc";
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    if (hasCustomVideo) videoEl.muted = false;
+    showToast("Đã bật Âm thanh gốc của video");
+  };
+
+  // Tải file video người dùng
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+
+  dropzone.onclick = () => fileInput.click();
+  dropzone.ondragover = (e) => { e.preventDefault(); dropzone.classList.add("dragover"); };
+  dropzone.ondragleave = () => dropzone.classList.remove("dragover");
+  dropzone.ondrop = (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    if (e.dataTransfer.files[0]) handleVideoFile(e.dataTransfer.files[0]);
+  };
+  fileInput.onchange = (e) => {
+    if (e.target.files[0]) handleVideoFile(e.target.files[0]);
+  };
+
+  function handleVideoFile(file) {
+    pausePlayback();
+    const url = URL.createObjectURL(file);
+    videoEl.src = url;
+    videoEl.onloadedmetadata = () => {
+      hasCustomVideo = true;
+      duration = videoEl.duration || 30;
+      seekBar.max = duration;
+      timeTotalEl.textContent = formatTime(duration);
+      document.getElementById("fileInfo").textContent = `Đã tải: ${file.name} (${formatTime(duration)})`;
+      redistributeTimings(duration);
+      seekTo(0);
+      showToast(`Đã nạp video "${file.name}" (${formatTime(duration)})`);
+    };
+  }
+
+  function redistributeTimings(totalDur) {
+    const count = segments.length;
+    const step = totalDur / count;
+    segments.forEach((seg, i) => {
+      seg.start = +(i * step).toFixed(2);
+      seg.end = +((i + 1) * step).toFixed(2);
+    });
+    renderSubtitlesList();
+  }
+
+  // Mô phỏng pipeline AI & đồng bộ giọng
+  document.getElementById("btnProcess").onclick = () => {
+    pausePlayback();
+    const steps = ["step1", "step2", "step3", "step4"];
+    const labels = [
+      "Đang tách luồng âm thanh...",
+      "Đang nhận diện giọng nói (STT)...",
+      "Đang dịch ngữ cảnh đa ngôn ngữ...",
+      "Đang khớp mốc thời gian & giọng đọc TTS..."
+    ];
+    const fill = document.getElementById("progressFill");
+    const pct = document.getElementById("pipelinePercent");
+    const status = document.getElementById("pipelineStatus");
+
+    steps.forEach(id => {
+      document.getElementById(id).className = "step-item";
+    });
+
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i > 0) document.getElementById(steps[i - 1]).className = "step-item done";
+      if (i < steps.length) {
+        document.getElementById(steps[i]).className = "step-item active";
+        status.textContent = labels[i];
+        const p = Math.round(((i + 1) / steps.length) * 100);
+        fill.style.width = p + "%";
+        pct.textContent = p + "%";
+        i++;
+      } else {
+        clearInterval(timer);
+        status.textContent = "Hoàn tất dịch thuật & sẵn sàng lồng tiếng!";
+        renderSubtitlesList();
+        seekTo(0);
+        startPlayback();
+        showToast("Đã đồng bộ lồng tiếng AI cho toàn bộ video!");
+      }
+    }, 450);
+  };
+
+  // Đổi ngôn ngữ đích
+  tgtLangEl.onchange = () => {
+    loadVoices();
+    renderSubtitlesList();
+    lastSpokenIndex = -1;
+    showToast("Đã chuyển ngôn ngữ đích sang " + tgtLangEl.options[tgtLangEl.selectedIndex].text);
+  };
+
+  // Thêm câu phụ đề mới
+  document.getElementById("btnAddSub").onclick = () => {
+    const lastEnd = segments.length ? segments[segments.length - 1].end : 0;
+    const newEnd = Math.min(duration, lastEnd + 4);
+    segments.push({
+      start: lastEnd,
+      end: newEnd > lastEnd ? newEnd : lastEnd + 3,
+      source: "New subtitle line...",
+      translations: { [tgtLangEl.value]: "Dòng phụ đề mới..." }
+    });
+    if (newEnd > duration) {
+      duration = newEnd;
+      seekBar.max = duration;
+      timeTotalEl.textContent = formatTime(duration);
+    }
+    renderSubtitlesList();
+  };
+
+  // Nhận diện giọng nói thật qua Micro (SpeechRecognition)
+  document.getElementById("btnSpeechRec").onclick = () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      showToast("Trình duyệt của bạn chưa hỗ trợ Web Speech Recognition.");
+      return;
+    }
+    const rec = new SpeechRec();
+    rec.lang = srcLangEl.value;
+    rec.continuous = true;
+    rec.interimResults = false;
+
+    const captured = [];
+    showToast("🎙️ Đang nghe lời thoại... Hãy phát video hoặc nói vào micro (10 giây)");
+    if (hasCustomVideo) {
+      videoEl.muted = false;
+      videoEl.play();
+    }
+
+    rec.onresult = (e) => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          captured.push(e.results[i][0].transcript.trim());
+        }
+      }
+    };
+
+    rec.onerror = () => showToast("Không thu được âm thanh từ micro.");
+    rec.start();
+
+    setTimeout(() => {
+      rec.stop();
+      if (captured.length > 0) {
+        const step = duration / captured.length;
+        segments = captured.map((line, idx) => ({
+          start: +(idx * step).toFixed(2),
+          end: +((idx + 1) * step).toFixed(2),
+          source: line,
+          translations: { [tgtLangEl.value]: simpleTranslate(line, tgtLangEl.value) }
+        }));
+        renderSubtitlesList();
+        showToast(`Đã chép được ${captured.length} câu thoại thật!`);
+      } else {
+        showToast("Chưa nhận diện được câu thoại nào. Hãy thử nhập kịch bản thủ công.");
+      }
+    }, 10000);
+  };
+
+  function simpleTranslate(text, targetLang) {
+    const lower = text.toLowerCase();
+    for (const key in QUICK_DICT) {
+      if (lower.includes(key) && QUICK_DICT[key][targetLang]) {
+        return QUICK_DICT[key][targetLang];
+      }
+    }
+    return text;
+  }
+
+  // Modal nhập kịch bản / SRT
+  const importModal = document.getElementById("importModal");
+  document.getElementById("btnOpenImport").onclick = () => importModal.classList.add("open");
+  document.getElementById("btnCloseImport").onclick = () => importModal.classList.remove("open");
+  document.getElementById("btnCancelImport").onclick = () => importModal.classList.remove("open");
+
+  document.getElementById("btnApplyImport").onclick = () => {
+    const raw = document.getElementById("importText").value.trim();
+    if (!raw) return;
+    const lines = raw.split(/
++/).map(l => l.trim()).filter(l => l && !/^\d+$/.test(l) && !l.includes("-->"));
+    if (lines.length === 0) return;
+
+    const step = duration / lines.length;
+    segments = lines.map((line, idx) => ({
+      start: +(idx * step).toFixed(2),
+      end: +((idx + 1) * step).toFixed(2),
+      source: line,
+      translations: { [tgtLangEl.value]: simpleTranslate(line, tgtLangEl.value) }
+    }));
+    renderSubtitlesList();
+    importModal.classList.remove("open");
+    seekTo(0);
+    showToast(`Đã nạp ${lines.length} câu thoại vào video!`);
+  };
+
+  // Xuất file .SRT và .VTT
+  function downloadBlob(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+
+  document.getElementById("btnExportSRT").onclick = () => {
+    const srt = segments.map((s, i) => {
+      return `${i + 1}
+${formatSRTTime(s.start)} --> ${formatSRTTime(s.end)}
+${getTargetText(s)}
+`;
+    }).join("
+");
+    downloadBlob(srt, `voxflow_subtitles_${tgtLangEl.value}.srt`, "text/plain;charset=utf-8");
+    showToast("Đã tải xuống file phụ đề .SRT!");
+  };
+
+  document.getElementById("btnExportVTT").onclick = () => {
+    const vtt = "WEBVTT
+
+" + segments.map((s) => {
+      return `${formatSRTTime(s.start).replace(",", ".")} --> ${formatSRTTime(s.end).replace(",", ".")}
+${getTargetText(s)}
+`;
+    }).join("
+");
+    downloadBlob(vtt, `voxflow_subtitles_${tgtLangEl.value}.vtt`, "text/vtt;charset=utf-8");
+    showToast("Đã tải xuống file phụ đề .VTT!");
+  };
+
+  // Xuất Video .WEBM kèm phụ đề đốt cứng
+  document.getElementById("btnExportVideo").onclick = () => {
+    if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
+      showToast("Trình duyệt không hỗ trợ ghi video trực tiếp.");
+      return;
+    }
+    showToast("🎬 Đang kết xuất video kèm phụ đề... Vui lòng đợi chạy hết video!");
+    seekTo(0);
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `voxflow_dubbed_${tgtLangEl.value}.webm`;
+      a.click();
+      showToast("✅ Đã xuất file video .WEBM thành công!");
+    };
+
+    recorder.start();
+    startPlayback();
+
+    const checkEnd = setInterval(() => {
+      if (!isPlaying || currentTime >= duration - 0.1) {
+        clearInterval(checkEnd);
+        pausePlayback();
+        if (recorder.state !== "inactive") recorder.stop();
+      }
+    }, 300);
+  };
+
+  // Khởi chạy
+  renderSubtitlesList();
+  requestAnimationFrame(loop);
+</script>
+</body>
+</html>
